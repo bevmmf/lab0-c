@@ -3,13 +3,13 @@
 #include <string.h>
 
 #include "queue.h"
-
 /* Notice: sometimes, Cppcheck would find the potential NULL pointer bugs,
  * but some of them cannot occur. You can suppress them by adding the
  * following line.
  *   cppcheck-suppress nullPointer
  */
 
+/* cppcheck-suppress memleak */
 
 /* Create an empty queue */
 struct list_head *q_new()
@@ -29,21 +29,51 @@ void q_free(struct list_head *head)
     }
     element_t *entry, *safe;
     list_for_each_entry_safe (entry, safe, head, list) {
-        list_del(&entry->list);
+        list_del(&(entry->list));
         q_release_element(entry);
     }
     free(head);
 }
 
 /* Insert an element at head of queue */
+// cppcheck-suppress constParameterPointer
 bool q_insert_head(struct list_head *head, char *s)
 {
+    if (!head)
+        return false;
+    element_t *element_h = malloc(sizeof(element_t));
+    if (!element_h)
+        return false;
+    element_h->value = strdup(s);
+    if (!element_h->value) {
+        free(element_h);
+        return false;
+    }
+    // cppcheck-suppress memleak 
+    /* New node ownership is transferred to the queue; it will be freed in q_free() */
+    list_add(&(element_h->list), head);
+    // cppcheck-suppress constParameterPointer
     return true;
 }
 
 /* Insert an element at tail of queue */
+// cppcheck-suppress constParameterPointer
 bool q_insert_tail(struct list_head *head, char *s)
 {
+    if (!head)
+        return false;
+    element_t *element_h = malloc(sizeof(element_t));
+    if (!element_h)
+        return false;
+    element_h->value = strdup(s);
+    if (!element_h->value) {
+        free(element_h);
+        return false;
+    }
+    // cppcheck-suppress memleak 
+    /* New node ownership is transferred to the queue; it will be freed in q_free() */
+    list_add_tail(&(element_h->list), head);
+    // cppcheck-suppress constParameterPointer
     return true;
 }
 

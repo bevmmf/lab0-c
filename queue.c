@@ -106,6 +106,7 @@ int q_size(struct list_head *head)
 bool q_delete_mid(struct list_head *head)
 {
     // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
+
     return true;
 }
 
@@ -119,11 +120,51 @@ bool q_delete_dup(struct list_head *head)
 /* Swap every two adjacent nodes */
 void q_swap(struct list_head *head)
 {
+    if (!head || list_empty(head))
+        return;
     // https://leetcode.com/problems/swap-nodes-in-pairs/
+    void swap2node(struct list_head * node1, struct list_head * node2)
+    {
+        struct list_head *temp1 = node1->prev;
+        struct list_head *temp2 = node2->next;
+        node1->next = temp2;
+        node1->prev = node2;
+        node2->next = node1;
+        node2->prev = temp1;
+        temp1->next = node2;
+        temp2->prev = node1;
+        return;
+    }
+    struct list_head *trav = NULL;
+    struct list_head *safe = NULL;
+    int count = 0;
+    list_for_each_safe (trav, safe, head) {
+        count++;
+        if (count == 2) {
+            swap2node(trav->prev, trav);
+            count = 0;
+        }
+    }
+    return;
 }
 
 /* Reverse elements in queue */
-void q_reverse(struct list_head *head) {}
+void q_reverse(struct list_head *head)
+{
+    if (!head || list_empty(head))
+        return;
+    struct list_head *trav = NULL;
+    struct list_head *safe = NULL;
+    list_for_each_safe (trav, safe, head) {
+        trav->next = trav->prev;
+        trav->prev = safe;
+    }
+    struct list_head *temp = NULL;
+    temp = head->next;
+    head->next = head->prev;
+    head->prev = temp;
+    return;
+}
 
 /* Reverse the nodes of the list k at a time */
 void q_reverseK(struct list_head *head, int k)

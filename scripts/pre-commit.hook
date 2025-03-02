@@ -135,27 +135,8 @@ if command -v sha1sum >/dev/null 2>&1; then
 elif command -v shasum >/dev/null 2>&1; then
   SHA1SUM="shasum"
 else
-  throw "sha1sum or shasum not installed."
-fi
-
-# Get staged filenames (added, copied, or modified) into an array.
-FILES=($(git diff --cached --name-only --diff-filter=ACM))
-binary_files=()
-
-for file in "${FILES[@]}"; do
-  # Get MIME info for the file.
-  mime_info=$(file --mime "$file")
-  # Extract a friendly filename (everything before the colon).
-  name=$(file "$file" | cut -d ":" -f1)
-
-  if echo "$mime_info" | grep -qi binary; then
-    binary_files+=("$name")
-    printf "${RED}[!]${NC} '${YELLOW}$name${NC}' appears to be a binary blob.\n"
-  fi
-done
-
-if [ "${#binary_files[@]}" -gt 0 ]; then
-  printf "${RED}[!]${NC} Binary data found.\n"
+  echo "[!] sha1sum or shasum not installed." >&2
+  exit 1
 fi
 
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E "\.(c|cpp|h)$")

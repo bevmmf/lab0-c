@@ -21,7 +21,7 @@ void q_free(struct list_head *head)
         return;
     element_t *trav = NULL, *safe = NULL;
 
-    list_for_each_entry_safe (trav, safe, head, list) {
+    list_for_each_entry_safe(trav, safe, head, list) {
         list_del(&trav->list);
         q_release_element(trav);
     }
@@ -97,7 +97,7 @@ int q_size(struct list_head *head)
     int count = 0;
     struct list_head *trav;
 
-    list_for_each (trav, head)
+    list_for_each(trav, head)
         count++;
     return count;
 }
@@ -128,6 +128,24 @@ bool q_delete_mid(struct list_head *head)
 bool q_delete_dup(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-duplicates-from-sorted-list-ii/
+    if (!head || list_empty(head))
+        return false;
+    struct list_head *trav, *safe;
+    bool flag = false;
+    list_for_each_safe(trav, safe, head) {
+        if (safe != head && !strcmp(list_entry(trav, element_t, list)->value,
+                                    list_entry(safe, element_t, list)->value)) {
+            list_del(trav);
+            q_release_element(list_entry(trav, element_t, list));
+            flag = true;
+        } else {
+            if (flag) {
+                list_del(trav);
+                q_release_element(list_entry(trav, element_t, list));
+                flag = false;
+            }
+        }
+    }
     return true;
 }
 
@@ -152,7 +170,7 @@ void q_swap(struct list_head *head)
     struct list_head *trav = NULL;
     struct list_head *safe = NULL;
     int count = 0;
-    list_for_each_safe (trav, safe, head) {
+    list_for_each_safe(trav, safe, head) {
         count++;
         if (count == 2) {
             swap2node(trav->prev, trav);
@@ -169,7 +187,7 @@ void q_reverse(struct list_head *head)
         return;
     struct list_head *trav = NULL;
     struct list_head *safe = NULL;
-    list_for_each_safe (trav, safe, head) {
+    list_for_each_safe(trav, safe, head) {
         trav->next = trav->prev;
         trav->prev = safe;
     }
@@ -193,7 +211,7 @@ void q_reverseK(struct list_head *head, int k)
     int count = 0;
     //
     struct list_head *trav, *safe;
-    list_for_each_safe (trav, safe, head) {
+    list_for_each_safe(trav, safe, head) {
         count++;
         if (count == k) {
             list_cut_position(&reversek, head, trav);

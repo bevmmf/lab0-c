@@ -236,7 +236,69 @@ void q_reverseK(struct list_head *head, int k)
 }
 
 /* Sort elements of queue in ascending/descending order */
-void q_sort(struct list_head *head, bool descend) {}
+
+// Merge the two lists in one sorted list.
+struct list_head *merge2sortedlist(struct list_head *left,
+                                   struct list_head *right,
+                                   bool descend)
+{
+    struct list_head *new_head = NULL, **indirect = &new_head,
+                     **chosen_list_ptr = NULL;
+    for (; left && right; *chosen_list_ptr = (*chosen_list_ptr)->next) {
+        if (descend) {
+            chosen_list_ptr =
+                strcmp(list_entry(left, element_t, list)->value,
+                       list_entry(right, element_t, list)->value) >= 0
+                    ? &left
+                    : &right;
+        } else {
+            chosen_list_ptr =
+                strcmp(list_entry(left, element_t, list)->value,
+                       list_entry(right, element_t, list)->value) <= 0
+                    ? &left
+                    : &right;
+        }
+        *indirect = *chosen_list_ptr;
+        indirect = &(*indirect)->next;
+    }
+    *indirect = (struct list_head *) ((__int64_t) left | (__int64_t) right);
+    return new_head;
+}
+
+// Divide the list into several nodes
+struct list_head *merge_sort(struct list_head *L, bool descend)
+{
+    if (!L || L->next == NULL)
+        return L;
+    struct list_head *fast = L, *slow = L, *mid;
+    for (; fast && fast->next; slow = slow->next, fast = fast->next->next)
+        ;
+    mid = slow;
+    // cutoff
+    slow->prev->next = NULL;
+    struct list_head *left = merge_sort(L, descend);
+    struct list_head *right = merge_sort(mid, descend);
+    return merge2sortedlist(left, right, descend);
+}
+
+
+void q_sort(struct list_head *head, bool descend)
+{
+    if (!head || list_empty(head) || list_is_singular(head))
+        return;
+    // cutoff
+    head->prev->next = NULL;
+    head->next = merge_sort(head->next, descend);
+    // link back
+    struct list_head *trav = head, *safe = head->next;
+    for (; safe != NULL; trav = trav->next, safe = safe->next) {
+        safe->prev = trav;
+    }
+    trav->next = head;
+    head->prev = trav;
+    return;
+}
+
 
 /* Remove every node which has a node with a strictly less value anywhere to
  * the right side of it */

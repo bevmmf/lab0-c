@@ -19,8 +19,7 @@ void q_free(struct list_head *head)
 {
     if (!head)
         return;
-    element_t *trav = NULL, *safe = NULL;
-
+    element_t *trav, *safe;
     list_for_each_entry_safe(trav, safe, head, list) {
         list_del(&trav->list);
         q_release_element(trav);
@@ -35,11 +34,14 @@ bool q_insert_head(struct list_head *head, char *s)
         return false;
 
     element_t *new = malloc(sizeof(element_t));
+    if (!new)
+        return false;
     INIT_LIST_HEAD(&new->list);
     new->value = strdup(s);
-    if (!new->value)
+    if (!new->value) {
+        free(new);
         return false;
-
+    }
     list_add(&new->list, head);
     return true;
 }
@@ -51,11 +53,14 @@ bool q_insert_tail(struct list_head *head, char *s)
         return false;
 
     element_t *new = malloc(sizeof(element_t));
+    if (!new)
+        return false;
     INIT_LIST_HEAD(&new->list);
     new->value = strdup(s);
-    if (!new->value)
+    if (!new->value) {
+        free(new);
         return false;
-
+    }
     list_add_tail(&new->list, head);
     return true;
 }
@@ -69,7 +74,10 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
         struct list_head *enemy = head->next;
         element_t *removed_e = list_entry(enemy, element_t, list);
         list_del(&removed_e->list);
-        strncpy(sp, removed_e->value, bufsize - 1);
+        if (sp) {
+            strncpy(sp, removed_e->value, bufsize - 1);
+            sp[bufsize - 1] = '\0';
+        }
         return removed_e;
     }
 }
@@ -83,7 +91,10 @@ element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
         struct list_head *enemy = head->prev;
         element_t *removed_e = list_entry(enemy, element_t, list);
         list_del(&removed_e->list);
-        strncpy(sp, removed_e->value, bufsize - 1);
+        if (sp) {
+            strncpy(sp, removed_e->value, bufsize - 1);
+            sp[bufsize - 1] = '\0';
+        }
         return removed_e;
     }
 }
@@ -185,14 +196,12 @@ void q_reverse(struct list_head *head)
 {
     if (!head || list_empty(head))
         return;
-    struct list_head *trav = NULL;
-    struct list_head *safe = NULL;
+    struct list_head *trav, *safe;
     list_for_each_safe(trav, safe, head) {
         trav->next = trav->prev;
         trav->prev = safe;
     }
-    struct list_head *temp = NULL;
-    temp = head->next;
+    struct list_head *temp = head->next;
     head->next = head->prev;
     head->prev = temp;
     return;

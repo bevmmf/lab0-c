@@ -119,14 +119,17 @@ bool q_delete_mid(struct list_head *head)
     // https://leetcode.com/problems/delete-the-middle-node-of-a-linked-list/
     if (!head || list_empty(head))
         return false;
-    struct list_head *fast = head->next->next;
-    struct list_head *slow = head->next;
+    struct list_head *slow = head->next, *fast = head->next, *temp;
     while (1) {
-        if (fast->next == head) {
+        if (fast->next->next == head) {
+            temp = slow->next;
             list_del(slow->next);
+            q_release_element(list_entry(temp, element_t, list));
             return true;
-        } else if (fast == head) {
+        } else if (fast->next == head) {
+            temp = slow;
             list_del(slow);
+            q_release_element(list_entry(temp, element_t, list));
             return true;
         }
         slow = slow->next;
@@ -159,27 +162,27 @@ bool q_delete_dup(struct list_head *head)
     }
     return true;
 }
-
+// auxiliary function for q_swap
+void swap2node(struct list_head *node1, struct list_head *node2)
+{
+    struct list_head *temp1 = node1->prev;
+    struct list_head *temp2 = node2->next;
+    node1->next = temp2;
+    node1->prev = node2;
+    node2->next = node1;
+    node2->prev = temp1;
+    temp1->next = node2;
+    temp2->prev = node1;
+    return;
+}
 /* Swap every two adjacent nodes */
 void q_swap(struct list_head *head)
 {
     if (!head || list_empty(head))
         return;
     // https://leetcode.com/problems/swap-nodes-in-pairs/
-    void swap2node(struct list_head * node1, struct list_head * node2)
-    {
-        struct list_head *temp1 = node1->prev;
-        struct list_head *temp2 = node2->next;
-        node1->next = temp2;
-        node1->prev = node2;
-        node2->next = node1;
-        node2->prev = temp1;
-        temp1->next = node2;
-        temp2->prev = node1;
-        return;
-    }
-    struct list_head *trav = NULL;
-    struct list_head *safe = NULL;
+
+    struct list_head *trav, *safe;
     int count = 0;
     list_for_each_safe(trav, safe, head) {
         count++;

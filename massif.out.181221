@@ -1,0 +1,97 @@
+desc: (none)
+cmd: ./qtest -f traces/trace-17-complexity.cmd
+time_unit: i
+#-----------
+snapshot=0
+#-----------
+time=0
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=248335
+mem_heap_B=256
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=249116
+mem_heap_B=256
+mem_heap_extra_B=8
+mem_stacks_B=0
+heap_tree=detailed
+n1: 256 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 256 0x4A510F3: __posix_spawn_file_actions_realloc (spawn_faction_init.c:32)
+  n1: 256 0x4A50EA7: posix_spawn_file_actions_adddup2 (spawn_faction_adddup2.c:37)
+   n1: 256 0x10D3BB: commit_exists (qtest.c:1217)
+    n1: 256 0x10D596: sanity_check (qtest.c:1328)
+     n0: 256 0x10D596: main (qtest.c:1371)
+#-----------
+snapshot=3
+#-----------
+time=249116
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=249254
+mem_heap_B=472
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=249710
+mem_heap_B=4568
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=290678
+mem_heap_B=4568
+mem_heap_extra_B=24
+mem_stacks_B=0
+heap_tree=peak
+n3: 4568 (heap allocation functions) malloc/new/new[], --alloc-fns, etc.
+ n1: 4096 0x49C71B4: _IO_file_doallocate (filedoalloc.c:101)
+  n1: 4096 0x49D7523: _IO_doallocbuf (genops.c:347)
+   n1: 4096 0x49D4883: _IO_file_underflow@@GLIBC_2.2.5 (fileops.c:486)
+    n1: 4096 0x49D75D1: _IO_default_uflow (genops.c:362)
+     n1: 4096 0x49C8F79: _IO_getline_info (iogetline.c:60)
+      n1: 4096 0x49C7BD3: fgets (iofgets.c:53)
+       n1: 4096 0x10D2FF: fgets (stdio2.h:200)
+        n1: 4096 0x10D2FF: commit_exists (qtest.c:1260)
+         n1: 4096 0x10D596: sanity_check (qtest.c:1328)
+          n0: 4096 0x10D596: main (qtest.c:1371)
+ n1: 472 0x49C759D: fdopen@@GLIBC_2.2.5 (iofdopen.c:122)
+  n1: 472 0x10D2DB: commit_exists (qtest.c:1251)
+   n1: 472 0x10D596: sanity_check (qtest.c:1328)
+    n0: 472 0x10D596: main (qtest.c:1371)
+ n0: 0 in 1 place, below massif's threshold (1.00%)
+#-----------
+snapshot=7
+#-----------
+time=290678
+mem_heap_B=472
+mem_heap_extra_B=16
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=290816
+mem_heap_B=0
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty

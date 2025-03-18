@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
+#include "list_sort.h"
 #if defined(__APPLE__)
 #include <mach/mach_time.h>
 #else /* Assume POSIX environments */
@@ -58,7 +58,7 @@ extern int show_entropy;
 #define BIG_LIST_SIZE 30
 
 /* Global variables */
-
+static int use_list_sort = 0;
 typedef struct {
     struct list_head head;
     int size;
@@ -576,6 +576,14 @@ static bool do_size(int argc, char *argv[])
     return ok && !error_check();
 }
 
+static int cmp(void *priv,
+               const struct list_head *l1,
+               const struct list_head *l2)
+{
+    return strcmp(list_entry(l1, element_t, list)->value,
+                  list_entry(l2, element_t, list)->value);
+}
+
 bool do_sort(int argc, char *argv[])
 {
     if (argc != 1) {
@@ -613,7 +621,8 @@ bool do_sort(int argc, char *argv[])
                current->size, MAX_NODES);
 
     if (current && exception_setup(true))
-        q_sort(current->q, descend);
+        use_list_sort ? list_sort(NULL, current->q, cmp)
+                      : q_sort(current->q, descend);
     exception_cancel();
     set_noallocate_mode(false);
 
@@ -1104,6 +1113,8 @@ static void console_init()
               "Number of times allow queue operations to return false", NULL);
     add_param("descend", &descend,
               "Sort and merge queue in ascending/descending order", NULL);
+    add_param("list_sort", &use_list_sort,
+              "Use the sort which is made by linux kernel developers", NULL);
 }
 
 /* Signal handlers */
